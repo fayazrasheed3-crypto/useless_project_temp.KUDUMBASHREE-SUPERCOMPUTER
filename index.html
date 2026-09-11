@@ -1,1 +1,1751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KUDUMBASHREE SUPERCOMPUTER™</title>
+<style>
+  :root{
+    --green-deep:   #123C31;
+    --green-mid:    #1D5C4B;
+    --gold:         #C79A3D;
+    --gold-soft:    #E7C878;
+    --maroon:       #7C1F2B;
+    --ivory:        #F6EFDC;
+    --paper:        #FFFBF0;
+    --ink:          #201C15;
+    --ink-soft:     #55503F;
+    --line:         #D8CBA3;
+  }
 
+  *{ box-sizing: border-box; }
+
+  body{
+    margin: 0;
+    background: var(--ivory);
+    color: var(--ink);
+    font-family: Georgia, "Iowan Old Style", "Palatino Linotype", serif;
+    line-height: 1.5;
+    padding: 32px 16px 64px;
+  }
+
+  .wrap{
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  /* ---------- HEADER ---------- */
+  header{
+    text-align: center;
+    padding: 28px 20px 30px;
+    border: 2px solid var(--green-deep);
+    border-radius: 4px;
+    background: var(--paper);
+    position: relative;
+  }
+
+  .seal{
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 10px;
+    border: 2px solid var(--gold);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    background: var(--green-deep);
+  }
+
+  h1{
+    font-size: clamp(1.6rem, 5vw, 2.4rem);
+    letter-spacing: 0.02em;
+    margin: 0 0 6px;
+    color: var(--green-deep);
+  }
+
+  header .tm{ font-size: 0.55em; vertical-align: super; }
+
+  .tagline{
+    font-family: "Courier New", ui-monospace, monospace;
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+    letter-spacing: 0.02em;
+    border-top: 1px dashed var(--line);
+    margin-top: 12px;
+    padding-top: 10px;
+  }
+
+  /* ---------- INPUT CARD ---------- */
+  .console{
+    margin-top: 26px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 24px;
+  }
+
+  .console label{
+    display: block;
+    font-size: 0.95rem;
+    color: var(--ink-soft);
+    margin-bottom: 8px;
+  }
+
+  textarea{
+    width: 100%;
+    min-height: 90px;
+    padding: 12px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    font-family: inherit;
+    font-size: 1rem;
+    background: #fff;
+    color: var(--ink);
+    resize: vertical;
+  }
+  textarea:focus{ outline: 2px solid var(--gold); outline-offset: 1px; }
+
+  .hint{
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+    margin-top: 6px;
+  }
+
+  button#consultBtn{
+    margin-top: 16px;
+    width: 100%;
+    padding: 14px 18px;
+    background: var(--green-deep);
+    color: var(--ivory);
+    border: none;
+    border-radius: 3px;
+    font-family: Georgia, serif;
+    font-size: 1.05rem;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.1s ease;
+  }
+  button#consultBtn:hover{ background: var(--green-mid); }
+  button#consultBtn:active{ transform: translateY(1px); }
+  button#consultBtn:disabled{ background: #999; cursor: not-allowed; }
+  button#consultBtn:focus-visible{ outline: 3px solid var(--gold); outline-offset: 2px; }
+
+  /* ---------- TERMINAL / LOADING ---------- */
+  .terminal{
+    display: none;
+    margin-top: 22px;
+    background: #0F241D;
+    color: #B9E3C6;
+    border-radius: 4px;
+    padding: 18px 20px;
+    font-family: "Courier New", ui-monospace, monospace;
+    font-size: 0.85rem;
+  }
+  .terminal .line, .appeal-terminal .line{
+    margin: 3px 0;
+    opacity: 0;
+    animation: appear 0.25s ease forwards;
+  }
+  @keyframes appear{ to{ opacity: 1; } }
+
+  .progress-shell{
+    margin-top: 12px;
+    height: 8px;
+    background: #06120E;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .progress-fill{
+    height: 100%;
+    width: 0%;
+    background: var(--gold-soft);
+    transition: width 0.35s ease;
+  }
+
+  /* ---------- COMMITTEE ---------- */
+  .committee{
+    display: none;
+    margin-top: 28px;
+  }
+  .committee h2{
+    font-size: 1.1rem;
+    color: var(--green-deep);
+    text-align: center;
+    margin-bottom: 16px;
+    font-weight: normal;
+    font-style: italic;
+  }
+
+  .members{
+    display: grid;
+    gap: 14px;
+  }
+
+  .member{
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-left: 5px solid var(--member-color, var(--gold));
+    border-radius: 3px;
+    padding: 14px 16px;
+    opacity: 0;
+    transform: translateY(6px) rotate(var(--tilt, 0deg));
+    animation: pin 0.4s ease forwards;
+  }
+  @keyframes pin{ to{ opacity: 1; transform: translateY(0) rotate(var(--tilt, 0deg)); } }
+
+  .member .who{
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+  .member .avatar{ font-size: 1.2rem; }
+  .member .name{ font-weight: bold; color: var(--ink); }
+  .member .role{
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+    font-style: italic;
+  }
+  .member .opinion{ font-size: 0.95rem; }
+
+  /* ---------- DELIBERATION & VOTE ---------- */
+  .deliberation, .vote-section{
+    display: none;
+    margin-top: 26px;
+  }
+  .deliberation h2, .vote-section h2{
+    font-size: 1.1rem;
+    color: var(--green-deep);
+    text-align: center;
+    margin-bottom: 16px;
+    font-weight: normal;
+    font-style: italic;
+  }
+  .debate-lines, .votes{
+    display: grid;
+    gap: 10px;
+  }
+  .debate-line, .vote-card{
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 11px 14px;
+    opacity: 0;
+    animation: pin 0.35s ease forwards;
+  }
+  .debate-line strong, .vote-card .voter{ color: var(--green-deep); }
+  .vote-card{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-left: 5px solid var(--member-color, var(--gold));
+  }
+  .vote-value{
+    font-family: "Courier New", ui-monospace, monospace;
+    font-weight: bold;
+    color: var(--maroon);
+  }
+
+  /* ---------- VERDICT ---------- */
+  .verdict{
+    display: none;
+    margin-top: 26px;
+    position: relative;
+    background: var(--paper);
+    border: 2px solid var(--maroon);
+    border-radius: 4px;
+    padding: 22px 22px 20px;
+  }
+  .verdict .file-no{
+    font-family: "Courier New", ui-monospace, monospace;
+    font-size: 0.75rem;
+    color: var(--ink-soft);
+    margin-bottom: 10px;
+  }
+  .verdict h3{
+    margin: 0 0 10px;
+    color: var(--maroon);
+    font-size: 1.05rem;
+  }
+  .verdict p{ margin: 0 0 10px; }
+
+  .stamp{
+    display: inline-block;
+    border: 3px solid var(--maroon);
+    color: var(--maroon);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-weight: bold;
+    letter-spacing: 0.05em;
+    transform: rotate(-6deg);
+    font-size: 0.85rem;
+    margin-top: 6px;
+  }
+
+  .confidence{
+    font-family: "Courier New", ui-monospace, monospace;
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+    margin-top: 12px;
+    border-top: 1px dashed var(--line);
+    padding-top: 10px;
+  }
+
+  #appealBtn{
+    display: none;
+    margin-top: 12px;
+    width: 100%;
+    padding: 11px 14px;
+    background: var(--paper);
+    color: var(--maroon);
+    border: 1px solid var(--maroon);
+    border-radius: 3px;
+    font-family: Georgia, serif;
+    font-size: 0.9rem;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+  }
+  #appealBtn:hover{ background: #F7E9E5; }
+  #appealBtn:disabled{ color: #999; border-color: #999; cursor: not-allowed; }
+
+  .appeal-terminal, .appeal-committee, .appeal-vote, .appeal-decision{
+    display: none;
+    margin-top: 26px;
+  }
+  .appeal-terminal{
+    background: #0F241D;
+    color: #B9E3C6;
+    border-radius: 4px;
+    padding: 18px 20px;
+    font-family: "Courier New", ui-monospace, monospace;
+    font-size: 0.85rem;
+  }
+  .appeal-committee h2, .appeal-vote h2{
+    font-size: 1.1rem;
+    color: var(--green-deep);
+    text-align: center;
+    margin-bottom: 16px;
+    font-weight: normal;
+    font-style: italic;
+  }
+  .appeal-members, .appeal-votes{ display: grid; gap: 12px; }
+  .appeal-authority, .appeal-vote-card{
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-left: 5px solid var(--member-color, var(--gold));
+    border-radius: 3px;
+    padding: 13px 15px;
+    opacity: 0;
+    animation: pin 0.4s ease forwards;
+  }
+  .appeal-authority .name, .appeal-vote-card .voter{ font-weight: bold; color: var(--ink); }
+  .appeal-authority .role{ font-size: 0.78rem; color: var(--ink-soft); font-style: italic; }
+  .appeal-vote-card{ display: flex; justify-content: space-between; }
+  .appeal-decision{ border-color: var(--green-deep); }
+  .case-closed{
+    font-family: "Courier New", ui-monospace, monospace;
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+    border-top: 1px dashed var(--line);
+    padding-top: 10px;
+  }
+
+  footer{
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--ink-soft);
+    margin-top: 34px;
+  }
+
+  @media (min-width: 600px){
+    .members{ grid-template-columns: 1fr 1fr; }
+    .member:nth-child(5){ grid-column: 1 / -1; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .member, .terminal .line{ animation: none; opacity: 1; }
+    button#consultBtn{ transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header>
+    <div class="seal">🥥</div>
+    <h1>KUDUMBASHREE SUPERCOMPUTER<span class="tm">™</span></h1>
+    <div class="tagline">UNIT-047 &nbsp;·&nbsp; WARD 12 NEIGHBOURHOOD MAINFRAME &nbsp;·&nbsp; UPTIME: SINCE LAST ONAM</div>
+  </header>
+
+  <div class="console">
+    <label for="problemInput">Describe your problem. The Committee will handle it with the seriousness it deserves.</label>
+    <textarea id="problemInput" placeholder="e.g. My neighbour's chicken keeps entering my compound and I don't know what to do"></textarea>
+    <div class="hint">No problem too small. No problem too big. Same five aunties either way.</div>
+    <button id="consultBtn">CONSULT THE COMMITTEE</button>
+  </div>
+
+  <div class="terminal" id="terminal">
+    <div id="terminalLines"></div>
+    <div class="progress-shell"><div class="progress-fill" id="progressFill"></div></div>
+  </div>
+
+  <div class="committee" id="committee">
+    <h2>The Committee has convened. Unfortunately.</h2>
+    <div class="members" id="members"></div>
+  </div>
+
+  <div class="deliberation" id="deliberation">
+    <h2>Committee Deliberation: objections are now being recorded.</h2>
+    <div class="debate-lines" id="debateLines"></div>
+  </div>
+
+  <div class="vote-section" id="voteSection">
+    <h2>Committee Vote: hands raised, opinions louder.</h2>
+    <div class="votes" id="votes"></div>
+  </div>
+
+  <div class="verdict" id="verdict">
+    <div class="file-no" id="fileNo"></div>
+    <h3>OFFICIAL COMMITTEE VERDICT</h3>
+    <p id="verdictText"></p>
+    <span class="stamp">APPROVED*</span>
+    <div class="confidence" id="confidenceLine"></div>
+    <button id="appealBtn">APPEAL TO HIGHER AUTHORITY</button>
+  </div>
+
+  <div class="appeal-terminal" id="appealTerminal"><div id="appealLines"></div></div>
+
+  <div class="appeal-committee" id="appealCommittee">
+    <h2>APPEAL COMMITTEE: Area-level seriousness has been activated.</h2>
+    <p class="file-no" id="appealCaseSummary"></p>
+    <div class="appeal-members" id="appealMembers"></div>
+  </div>
+
+  <div class="appeal-vote" id="appealVote">
+    <h2>APPEAL VOTE: the relatives have spoken.</h2>
+    <div class="appeal-votes" id="appealVotes"></div>
+  </div>
+
+  <div class="verdict appeal-decision" id="appealDecision">
+    <div class="file-no" id="appealFileNo"></div>
+    <h3>FINAL APPEAL DECISION</h3>
+    <p id="appealDecisionText"></p>
+    <span class="stamp" id="appealStamp"></span>
+    <div class="case-closed">CASE STATUS: CLOSED<br>APPEAL LEVEL: AREA COMMITTEE<br>FINAL AUTHORITY: LEELAMMA AMMACHI</div>
+  </div>
+
+  <footer>*Approval is unanimous, after 20 minutes of shouting and one power cut.<br>KUDUMBASHREE SUPERCOMPUTER™ is not a real supercomputer. It is five aunties and a laptop.</footer>
+
+</div>
+
+<script>
+  // ---------- DATA ----------
+  const members = [
+    {
+      name: "Radha Ammachi",
+      role: "Chief Traditional Remedies Officer",
+      avatar: "👵",
+      color: "#7C1F2B",
+      tilt: "-1deg",
+      lines: (p) => [
+        `Drink warm turmeric milk before you even think about "${p}". It will feel forty percent smaller by morning.`,
+        `Have you prayed about it? Doesn't matter which temple, church or mosque, just go and light a lamp.`,
+        `In my time we didn't have "${p}". We had oil bath on Fridays and listening to elders. Try both.`,
+        `This smells like evil eye to me. Take mustard seeds and dried chillies, wave them around three times, and burn.`
+      ]
+    },
+    {
+      name: "Saramma Chechi",
+      role: "Head of Financial Affairs & Chit Funds",
+      avatar: "🧮",
+      color: "#C79A3D",
+      tilt: "1deg",
+      lines: (p) => [
+        `Before we solve "${p}", first tell me — is this a money problem wearing a costume? Most problems are.`,
+        `My advice is always the same: take a small SHG loan, start a small side business, and this will resolve itself by Onam.`,
+        `I am charging this problem an interest rate of 12% per annum, payable in monthly instalments of patience.`,
+        `Every issue in this ward has been solved historically by either a loan, a wedding, or both at once.`
+      ]
+    },
+    {
+      name: "Pappan Uncle",
+      role: "Chief Technical Advisor, Ex-Gulf Returnee",
+      avatar: "🛠️",
+      color: "#1D5C4B",
+      tilt: "-1deg",
+      lines: (p) => [
+        `Back in Dubai we would have fixed "${p}" with one generator, a good AC, and three WhatsApp forwards.`,
+        `Have you tried switching it off and on again? This works for televisions, marriages, and most problems.`,
+        `In my Sharjah company days, such issues simply did not exist. We had a proper SOP document for everything.`,
+        `Simple engineering fix: add one backup plan. Then add a backup for the backup. Then relax.`
+      ]
+    },
+    {
+      name: "Comrade Latha",
+      role: "Ward Committee President",
+      avatar: "📋",
+      color: "#123C31",
+      tilt: "1deg",
+      lines: (p) => [
+        `Kindly submit "${p}" as a written application, in triplicate, for discussion at the next general body meeting.`,
+        `This clearly requires a sub-committee. I am forming one right now. First meeting Sunday 4 PM sharp, will start 5:30.`,
+        `As per Kudumbashree bylaws section 4(b), your problem is officially "noted" but action requires quorum.`,
+        `Let us pass a resolution on this matter and revisit it after the ward development meeting next month.`
+      ]
+    },
+    {
+      name: "Beena Chechi",
+      role: "Head of Neighbourhood Intelligence",
+      avatar: "📢",
+      color: "#7C1F2B",
+      tilt: "0deg",
+      lines: (p) => [
+        `You know Sarala's daughter had the EXACT same "${p}" last month? Big drama. Don't even ask.`,
+        `I heard from the fish seller that something like this happened to the Panchayat member's cousin too.`,
+        `This "${p}" business is basically what happened in that house near the bus stand. Whole ward is talking.`,
+        `Don't worry, by tomorrow evening everyone will know about "${p}" anyway. Might as well fix it now.`
+      ]
+    }
+  ];
+
+  const loadingSteps = [
+    "Waking up the committee WhatsApp group (2,847 unread)...",
+    "Charging filter coffee capacitors to full aroma...",
+    "Calibrating coconut-oil cooling system...",
+    "Cross-checking against unofficial ration card database...",
+    "Booting Ammachi's Intuition Module v3.2...",
+    "Resolving conflicting opinions from five aunties...",
+    "Compiling verdict with unnecessary confidence..."
+  ];
+
+  const verdictTemplates = [
+    (p) => `After exhaustive deliberation, the Committee resolves that "${p}" shall be handled using filter coffee, one small loan, and prayer — strictly in that order. This decision is final until someone disagrees loudly.`,
+    (p) => `The Committee finds that "${p}" is a serious matter requiring immediate turmeric application and a follow-up sub-committee meeting, whichever happens first.`,
+    (p) => `It is hereby decided that "${p}" is 60% your fault, 30% the neighbour's fault, and 10% simply Kerala weather. Proceed accordingly.`,
+    (p) => `The Committee unanimously agrees that "${p}" would not have happened if you attended more Kudumbashree meetings. Solution attached anyway, out of kindness.`
+  ];
+
+  // ---------- HELPERS ----------
+  const $ = (id) => document.getElementById(id);
+  const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
+  const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+  // Local keyword detection: the first matching category is used.
+  const categories = [
+    ["electronics", /\b(phone|mobile|laptop|computer|tablet|tv|television|camera|headphone|electronics?)\b/i],
+    ["vehicles", /\b(car|bike|scooter|vehicle|bus|train|driving|petrol|diesel)\b/i],
+    ["food", /\b(food|eat|meal|diet|cook|restaurant|cafe|hungry|recipe)\b/i],
+    ["college", /\b(college|school|study|studying|exam|course|degree|assignment|class)\b/i],
+    ["relationships", /\b(relationship|marriage|marry|wedding|boyfriend|girlfriend|partner|love|breakup)\b/i],
+    ["shopping", /\b(buy|purchase|shop|shopping|dress|clothes|shoe|furniture)\b/i],
+    ["money", /\b(money|salary|budget|loan|emi|debt|save|savings|investment|rent)\b/i],
+    ["travel", /\b(travel|trip|vacation|holiday|flight|hotel|visit|tour)\b/i],
+    ["health", /\b(health|exercise|gym|workout|doctor|medicine|sleep|weight|fitness)\b/i],
+    ["neighbours", /\b(neighbour|neighbor|family|mother|father|sister|brother|relative|compound)\b/i]
+  ];
+
+  const topicRules = {
+    electronics: ["Is the old device truly finished, or merely unfashionable? In our time, we repaired things until the repairman retired.", "First tell me the price, EMI, warranty, and repair cost. A shiny screen is not a financial plan.", "Define the requirement: battery, camera, storage, or performance. Check software support and data backup before upgrading.", "This device request needs a needs assessment, two quotations, and household purchasing-committee approval.", "Who showed you this model? The whole ward suddenly wants the same phone after one cousin posted photos."],
+    vehicles: ["Do you need a vehicle, or do you need to walk a little more? First see whether the old one can be serviced.", "Include fuel, insurance, service, and EMI; the showroom price is only the opening ceremony.", "Compare mileage, safety, service network, spare-part cost, and reliability. Also make a maintenance and roadside-backup plan.", "Vehicle acquisition requires licence verification, parking approval, and a resolution about who will wash it.", "Who convinced you that this vehicle is necessary? Someone in the ward has clearly been showing off."],
+    food: ["Why order outside food when a simple home meal can settle both hunger and the stomach?", "Compare the parcel cost with cooking at home; small daily orders become a large monthly surprise.", "Consider nutrition, hygiene, preparation time, and storage life. A meal plan needs a backup option too.", "The menu requires consultation with all affected household members before anyone orders.", "Who told you about that place? The ward has already divided into groups over whose biryani is better."],
+    college: ["Study steadily and sleep properly; panic is not an examination strategy. In our time, one notebook and attention were enough.", "Check course fees, likely outcome, and whether another coaching payment actually adds value.", "Break the syllabus into modules, track weak areas, and test regularly. A study system beats last-night effort.", "Submit a timetable, attendance record, and assignment status to the education sub-committee.", "Who told you that this course is impossible? Somebody's cousin probably failed once and made it ward news."],
+    relationships: ["First ask whether this is a real problem or two tired people speaking angrily. Sit, eat, and talk calmly.", "Discuss responsibilities and expectations plainly; affection should not hide an unaffordable plan.", "Identify the failure point: communication, expectations, time, or trust. Do not restart the same argument without changing inputs.", "This needs a calm meeting, an agenda, and a written record of what each person expects.", "Who told you to make this decision now? The ward has probably received three versions already."],
+    shopping: ["Do you truly need it, or did a shop window make you forget what is already at home?", "What is the full price after delivery, interest, and add-ons? A sale is not savings unless it was planned.", "Compare material quality, warranty, expected life, and maintenance. Buy the version that solves the actual problem.", "Shopping requires a purchase requisition and confirmation that a similar item is not already in household inventory.", "Who influenced this shopping mission? Somebody's new dress or sofa has clearly started a chain reaction."],
+    money: ["Do not borrow for something that can wait. In our time, we saved little by little and slept peacefully.", "At last, the real issue: list income, fixed costs, interest, and repayment date before taking a loan or EMI.", "Track cash flow, identify leaks, automate savings, and keep an emergency reserve. Check what happens if income drops.", "Submit the income-and-expense statement to the finance sub-committee before funds are released.", "Who gave you this money idea? The ward always has one person recommending schemes at tea time."],
+    travel: ["Travel if it is necessary, but do not turn every holiday into exhaustion. Pack light and tell the family where you are going.", "Start with tickets, hotel, food, local travel, and emergency money. The cheapest fare is not always the cheapest trip.", "Check route reliability, weather, documents, charging, and a backup transport option. Build in buffer time.", "Travel needs leave approval, itinerary submission, emergency contacts, and a pre-departure committee briefing.", "Who suggested this destination? The ward has seen the same location in everyone's status this week."],
+    health: ["Start with regular sleep, home food, walking, and not worrying yourself sick. Do not chase every new fitness trend.", "Do not spend blindly on supplements, memberships, or miracle products. Choose care that gives real value.", "Set a realistic baseline and change one variable at a time. Check qualifications and safety before an intense routine.", "Please file your exercise plan with the wellness committee; excuses must be submitted before 9 AM.", "Who told you about this new routine? Someone in the ward has probably posted one dramatic before-and-after photo."],
+    neighbours: ["Speak gently first. Many family and neighbour troubles become smaller after tea, patience, and a little distance.", "Before escalating, consider the cost in time, peace, and possible repairs. A calm solution is usually cheaper.", "Define the exact issue, document recurring incidents, and agree a practical boundary or maintenance solution.", "A written complaint, joint meeting, and signed resolution are required before this becomes official.", "Ah, the ward has been discussing something similar. First tell me: who told you this was happening?"],
+    general: ["Ask whether this is truly necessary, then choose the simple option. In our time, we did not make every choice into a project.", "Before anything else: what will it cost now, every month, and if the plan goes wrong?", "Define the goal, compare options, list risks, and keep a backup plan. That is how sensible systems are built.", "This proposal needs an agenda, supporting documents, and a properly minuted committee discussion.", "Who put this idea in your head? I am sure somebody in the ward has a story behind it."]
+  };
+
+  const opinionOpeners = [
+    ["Listen, ", "My first question is this: "],
+    ["How much will this cost? ", "Let us look at the numbers. "],
+    ["From a systems perspective: ", "Technically speaking: "],
+    ["As per procedure, ", "Please note: "],
+    ["I have heard things. ", "See, the ward is watching. "]
+  ];
+
+  // Local subject detection layer: checks specific subjects first before category fallback
+  const subjects = [
+    // --- electronics ---
+    ["gaming_laptop", "electronics", /\b(gaming\s+laptop|gaming\s+notebook)\b/i],
+    ["laptop", "electronics", /\b(laptop|notebook|macbook|thinkpad)\b/i],
+    ["gaming_pc", "electronics", /\b(gaming\s+(pc|computer|desktop|rig)|custom\s+pc)\b/i],
+    ["desktop", "electronics", /\b(desktop|computer|pc)\b/i],
+    ["phone", "electronics", /\b(phone|smartphone|iphone|android|mobile)\b/i],
+    ["tablet", "electronics", /\b(tablet|ipad)\b/i],
+    ["headphones", "electronics", /\b(headphones?|earphones?|earbuds?|airpods?)\b/i],
+    ["tv", "electronics", /\b(tv|television|smart\s*tv|oled|qled)\b/i],
+    ["console", "electronics", /\b(gaming\s+console|ps[45]|playstation|xbox|nintendo(\s+switch)?)\b/i],
+
+    // --- vehicles ---
+    ["ev", "vehicles", /\b(electric\s+vehicle|electric\s+car|electric\s+scooter|electric\s+bike|ev|ather|ola\s+s1)\b/i],
+    ["scooter", "vehicles", /\b(scooter|activa|vespa|jupiter|scooty)\b/i],
+    ["bike", "vehicles", /\b(bike|motorcycle|bullet|royal\s+enfield|two\s*wheeler)\b/i],
+    ["car", "vehicles", /\b(car|cars|sedan|suv|hatchback|maruti|hyundai|tata)\b/i],
+
+    // --- food ---
+    ["biryani", "food", /\b(biryani|biriyani)\b/i],
+    ["pizza", "food", /\b(pizza|pizzas)\b/i],
+    ["burger", "food", /\b(burger|burgers)\b/i],
+    ["restaurant", "food", /\b(restaurant|restaurants|ordering\s+food|order\s+food|swiggy|zomato|takeaway|parcel|outside\s+food|cafe)\b/i],
+    ["cooking", "food", /\b(cook|cooking|recipe|recipes|kitchen|homemade|bake|baking)\b/i],
+
+    // --- college/studying ---
+    ["coding", "college", /\b(coding|programmer|programming|software|developer|leetcode|python|javascript|code|debug|debugging)\b/i],
+    ["exam", "college", /\b(exam|exams|examination|examinations|test|tests|viva|midterm|finals)\b/i],
+    ["studying", "college", /\b(studying|study|revision|learn|syllabus)\b/i],
+    ["assignment", "college", /\b(assignment|assignments|homework)\b/i],
+    ["project", "college", /\b(project|projects|final\s+year\s+project|mini\s+project)\b/i],
+    ["college", "college", /\b(college|university|degree|campus|engineering)\b/i],
+    ["class", "college", /\b(class|classes|lecture|lectures|attendance|tuition)\b/i],
+
+    // --- relationships ---
+    ["girlfriend", "relationships", /\b(girlfriend|gf)\b/i],
+    ["boyfriend", "relationships", /\b(boyfriend|bf)\b/i],
+    ["crush", "relationships", /\b(crush|propose|confess)\b/i],
+    ["dating", "relationships", /\b(dating|date|tinder|bumble|matrimonial)\b/i],
+    ["relationship", "relationships", /\b(relationship|relationships|breakup|partner|marriage|marry|wedding|engaged)\b/i],
+
+    // --- shopping ---
+    ["clothes", "shopping", /\b(clothes|clothing|shirt|shirts|shoes?|dress|dresses|sneakers?|saree|sarees|outfit)\b/i],
+    ["furniture", "shopping", /\b(furniture|sofa|bed|chair|chairs|table|tables|wardrobe|cupboard)\b/i],
+    ["expensive_purchase", "shopping", /\b(expensive\s+purchase|costly\s+purchase|big\s+purchase|luxury\s+purchase)\b/i],
+    ["shopping", "shopping", /\b(shopping|buying\s+something|buy\s+something|shop|mall|discount|sale)\b/i],
+
+    // --- money ---
+    ["loan", "money", /\b(loan|loans|personal\s+loan|gold\s+loan|home\s+loan|borrow)\b/i],
+    ["emi", "money", /\b(emi|emis|installment|instalment|installments|instalments)\b/i],
+    ["savings", "money", /\b(savings?|save\s+money|fixed\s+deposit|fd)\b/i],
+    ["investment", "money", /\b(investment|investments|investing|invest|stocks?|mutual\s+funds?|crypto|shares?)\b/i],
+
+    // --- travel ---
+    ["destinations", "travel", /\b(goa|kerala|bangalore|bengaluru|dubai|munnar|manali|wayanad|thailand)\b/i],
+    ["trip", "travel", /\b(trip|trips|road\s+trip)\b/i],
+    ["vacation", "travel", /\b(vacation|vacations|holiday|holidays|tour)\b/i],
+    ["travel", "travel", /\b(travel|traveling|travelling|flight|train|hotel|resort)\b/i],
+
+    // --- health/exercise ---
+    ["gym", "health", /\b(gym|gyms|gym\s+membership)\b/i],
+    ["workout", "health", /\b(workout|workouts|working\s+out|weight\s+training|calisthenics)\b/i],
+    ["running", "health", /\b(running|run|jogging|marathon)\b/i],
+    ["diet", "health", /\b(diet|dieting|intermittent\s+fasting|calories|protein)\b/i],
+    ["exercise", "health", /\b(exercise|exercises|fitness|yoga|walking)\b/i],
+
+    // --- neighbours/family ---
+    ["parking", "neighbours", /\b(parking|park\s+car|park\s+bike|driveway)\b/i],
+    ["neighbour", "neighbours", /\b(neighbour|neighbor|neighbours|neighbors|compound\s+wall|fence|loud\s+music)\b/i],
+    ["parents", "neighbours", /\b(parents|mother|father|amma|achan|mom|dad)\b/i],
+    ["relatives", "neighbours", /\b(relatives?|ammavan|cousin|cousins|uncle|aunty|in-laws?)\b/i],
+    ["family", "neighbours", /\b(family|families|household|joint\s+family)\b/i]
+  ];
+
+  const subjectRules = {
+    // Electronics
+    gaming_laptop: [
+      "In our time, one notebook and pencil did all calculations. Why do you need a glowing machine with fan noise like a helicopter for studying?",
+      "Have you seen the price of these graphic cards and gaming models? One lakh rupees for pressing keyboard buttons faster is not an SHG approved expenditure.",
+      "Check the TDP wattage, thermal cooling pipes, and dedicated GPU specs. Back in Sharjah our CAD laptops overheated unless placed near the AC vent.",
+      "Submit an undertaking stating this machine will be used 80% for productive work and only 20% for recreational graphics, pending committee inspection.",
+      "Suresh's son bought one gaming laptop claiming it was for artificial intelligence; now he sits up till 4 AM shouting into headphones while whole ward sleeps."
+    ],
+    laptop: [
+      "Does the old laptop not turn on at all? Take it to the junction repair shop and clean the dust before spending on a shiny new box.",
+      "Compare the educational discount and student EMI. Never buy high-end configurations when basic spreadsheet and browser tasks are all you need.",
+      "Check the RAM upgradeability, SSD bus speed, and battery cycle count. In Dubai, a solid business-class laptop lasted ten years minimum.",
+      "Submit three comparative price quotes from authorised dealers before seeking household capital equipment clearance.",
+      "Mini teacher bought a new sleek laptop online, and within two weeks the hinge broke because her nephew dropped it. Think twice."
+    ],
+    gaming_pc: [
+      "A giant box with colourful flashing lights sitting on the table? Pray to God and spend that time walking in the garden instead.",
+      "Between the power supply unit, monitor, and electricity bill, this desktop will single-handedly wipe out your monthly savings.",
+      "If you are assembling a custom tower, ensure proper airflow, gold-rated PSU, and surge protector. Kerala lightning season will fry an ungrounded rig in one second.",
+      "Such heavy electrical installations require domestic load sanction and a written notice to the local electricity board.",
+      "The boy in the yellow house assembled one huge computer with blinking green lights. His mother told the temple committee their electricity bill doubled."
+    ],
+    desktop: [
+      "A desktop computer that ties you to one chair all day? Better to keep good posture and not ruin your eyesight.",
+      "A desktop has better resale and cheaper replacement parts than portable devices, but verify if you truly have space in the house.",
+      "Form factor, motherboard socket longevity, and UPS backup are non-negotiable. Without a UPS, one Kerala power cut will corrupt your file system.",
+      "Requisition for a home computer workstation must include ergonomic clearance and designated study hours.",
+      "Panchayat office bought four new desktop computers last year; three are still sitting covered in blue plastic cloth."
+    ],
+    phone: [
+      "Is the old phone really dead, or did the screen just get one small scratch? Put a new tempered glass, wash your face, and use it for two more years.",
+      "Buying a phone on 24-month EMI with zero down payment is a trap. Calculate the total interest before taking your credit card out.",
+      "Check processor chipset, battery mAh, camera sensor, and software update roadmap. Don't buy just because of an apple logo.",
+      "Submit your requisition with reasons why the existing handset cannot handle essential phone calls and OTP verification.",
+      "Who showed you this model? The whole ward suddenly wants the same phone after one Gulf cousin posted photos from Lulu Mall."
+    ],
+    tablet: [
+      "Neither a phone nor a laptop—just a bigger glass plate to stare at. In our day, slate and chalk gave excellent handwriting.",
+      "First clarify if this tablet will replace an existing device or just become a costly video player lying on the dining table.",
+      "Check stylus latency, OS software support window, and whether you need cellular connectivity or just home Wi-Fi.",
+      "Tablet procurement is strictly subject to an educational utility certificate signed by the head of the house.",
+      "Sunitha bought an iPad for her toddler's rhymes; now the child won't eat idli without tapping the screen. Be careful."
+    ],
+    headphones: [
+      "Plugging loud noise directly into your ears day and night will make you deaf before forty. Listen to birds or natural sound instead.",
+      "Five thousand rupees for two tiny plastic buds that will get lost under the sofa in two weeks? Check your priorities.",
+      "Evaluate driver frequency response, impedance, and active noise cancellation. In Sharjah airport tarmac, only proper decibel reduction saved our hearing.",
+      "Earphone usage during committee proceedings is prohibited under bylaw 14. Keep at least one ear open to family instructions.",
+      "Manoj was walking near the railway crossing with both earphones on; two auto drivers had to scream at him. Ward safety first."
+    ],
+    tv: [
+      "Why buy a larger television just to watch serials and news debates with people shouting louder into your living room?",
+      "Check the annual energy rating and wall-mount installation charges. A cinema-sized TV in a small room is just wasted money.",
+      "Look for panel refresh rate, HDMI 2.1 ports for external inputs, and proper surge protection against voltage fluctuations.",
+      "Television screen enlargement must not disrupt children's evening study bell hours from 6:30 PM to 8:30 PM.",
+      "Balan Chettan bought a 65-inch screen; now all the neighbourhood uncles gather in his verandah for cricket matches and finish his tea."
+    ],
+    console: [
+      "A machine whose only job is playing video games? Go outside, sweep the courtyard, or play football in the ground.",
+      "The console is only the first cost; then each game CD costs four thousand rupees plus online subscription fees. It is a recurring liability.",
+      "Ensure adequate ventilation space around the console chassis. Those internal heatsinks trap dust rapidly in humid coastal air.",
+      "Gaming apparatus cannot be commissioned without strict guidelines regarding school holiday quotas and parental oversight.",
+      "Raju bought a PlayStation for his kids, and now his brother-in-law is the one sitting there all Sunday playing car racing."
+    ],
+
+    // Vehicles
+    scooter: [
+      "Ride carefully, wear a proper helmet with chin strap, and never speed through junction roads. An oil massage helps with back pain.",
+      "Check the on-road price, insurance renewal, and mileage per litre. A reliable scooter should save bus fare, not inflate petrol bills.",
+      "Inspect CVT belt condition, tubeless tyre grip, and front telescopic suspension. For Kerala potholes, chassis balance is vital.",
+      "Vehicle entry into the family registry requires valid licence, pollution certificate, and designated parking slot declaration.",
+      "Is this because Soman bought a new scooter last week? The whole junction saw him riding with three shopping bags hanging."
+    ],
+    bike: [
+      "These heavy loud motorcycles are just for show. Ride at 40 km/h, keep your eyes on the road, and pray before starting the engine.",
+      "Look at the fuel consumption and spare-part pricing. A heavy bike that gives 25 km per litre will burn through your salary.",
+      "Check dual-channel ABS, engine cooling efficiency in stop-and-go traffic, and chain lubrication schedule. Never compromise on braking distance.",
+      "Silencer modifications and rash driving violate community standards and will be reported to the ward transport cell.",
+      "The boy down the lane bought a second-hand sports bike; now every dog in the colony starts barking the moment he starts it."
+    ],
+    car: [
+      "A car is convenient when it rains, but walking keeps the joints healthy. Always carry drinking water and keep calm in traffic.",
+      "Showroom price is only the beginning: add road tax, comprehensive insurance, annual maintenance, and parking fees. Can you afford the EMI?",
+      "Check NCAP safety rating, service centre availability within 15 km, and engine reliability. In Dubai, Toyota ran forever because parts were everywhere.",
+      "Acquisition of four-wheeler transport requires proof of off-street parking space so neighbourhood lanes remain unobstructed.",
+      "Gopi bought a big sedan without checking his gate width; now every time he reverses, three neighbours have to guide him."
+    ],
+    ev: [
+      "Charging batteries everywhere... what if power cuts hit in monsoon season? Keep a simple cycle or backup ready.",
+      "Calculate the battery replacement cost after five years against petrol savings. Subsidies are good, but check resale market value.",
+      "Verify battery chemistry (LFP vs NMC), kilowatt-hour capacity, home 15A socket wiring, and real-world range with AC on.",
+      "Home EV charging installation must be cleared with the electrical inspectorate to avoid transformer tripping in the ward.",
+      "Chandran bought an electric scooter and got stuck near the bypass because he forgot to charge it overnight. Whole auto stand was laughing."
+    ],
+
+    // Food
+    biryani: [
+      "Why order heavy spiced biryani late at night? Eat light kanji or curd rice; your digestion will thank you in the morning.",
+      "Check the delivery charges, packaging fees, and restaurant GST. One parcel biryani costs equivalent to two days of family grocery.",
+      "If you must order, pick an outlet with proven hygiene and consistent oil quality. Bad meat disrupts the entire weekend productivity schedule.",
+      "Dinner logistics must be coordinated with all family members; individual biryani ordering while others eat plain gruel causes household friction.",
+      "Don't order from that new restaurant near the flyover. Baby teacher's nephew found raw masala and complained for three days."
+    ],
+    pizza: [
+      "Maida crust baked with cheese... in our time we ate hot pathiri or appam with vegetable stew. Much better for your health.",
+      "Six hundred rupees for bread and melted cheese? You can buy five kilograms of atta and two litres of milk for that amount.",
+      "Thermal retention of delivery cardboard boxes drops drastically after 20 minutes. If you want pizza, eat it fresh at the counter.",
+      "Fast-food consumption should be restricted to planned special occasions as per the ward wellness guidelines.",
+      "Preetha ordered a large pizza with extra toppings; the delivery boy couldn't find her house and called four neighbours for directions."
+    ],
+    burger: [
+      "A cold bun with a fried patty inside is not a proper meal. Drink a glass of warm jeera water if you feel heavy afterwards.",
+      "Combo meals with fries and soda are designed to extract maximum margin from your wallet. Stick to basic food options.",
+      "Nutritional density vs caloric payload is highly unfavourable. Treat it as an occasional snack, not primary fuel.",
+      "Snack expenditures must not exceed 5% of weekly food budget allocation. Minuted and recorded.",
+      "The college students at the corner cafe order burgers every evening; their tuition teacher told me none of them pay attention in class."
+    ],
+    restaurant: [
+      "Outside hotel food uses too much oil and artificial colour. Nothing beats freshly made home cooking with garden curry leaves.",
+      "Eating out multiple times a week is the number one reason young people have zero savings at the end of the month.",
+      "Check kitchen cleanliness ratings and customer turnaround speed. High turnover means fresh ingredients; empty restaurants are a red flag.",
+      "Table reservations and restaurant visits should be planned in advance to avoid impulsive dining-out expenses.",
+      "That family in flat 3B orders Swiggy parcels every single night; the delivery boxes in the waste bin tell the whole story."
+    ],
+    cooking: [
+      "Add a pinch of turmeric, fresh curry leaves, and grated coconut. Good home cooking cures more illnesses than medicine.",
+      "Buying seasonal vegetables from the local market and cooking at home cuts the household food budget by forty percent.",
+      "Standardise the recipe measurements and cooking sequence. Process control in the kitchen reduces waste and cooking time.",
+      "Kitchen inventory management requires regular auditing of pantry staples to avoid expiry of pulses and spices.",
+      "Molly tried making butter chicken after watching a YouTube video; she put two cups of chilli powder and her husband had tears for an hour."
+    ],
+
+    // College/Studying
+    exam: [
+      "Wash your eyes with cold water, drink warm milk with a pinch of pepper, and sleep by 10:30 PM. Panic never answered an exam question.",
+      "You already paid the examination registration fees; failing means paying supplementary fee next semester. Study hard and protect your wallet.",
+      "Triage the question paper: attempt high-probability, high-mark sections first. In engineering exams, systematic working scores marks.",
+      "All non-academic activities, mobile scrolling, and social functions are banned until the final exam hall ticket is signed.",
+      "Remember Venu's son who stayed up all night before the PSC test? He fell asleep during the second paper and dropped his pen."
+    ],
+    studying: [
+      "Sit up straight with good lighting and read aloud if you feel sleepy. Morning 5 AM study stays in the mind forever.",
+      "Education is the only investment that yields compound interest without market risk. Dedicate focused hours without distraction.",
+      "Break the syllabus into 45-minute modular blocks with 10-minute breaks. System architecture beats random cramming every single time.",
+      "A daily study timetable must be pinned to the wall and strictly executed under domestic committee supervision.",
+      "Radhika tells everyone her daughter studies 14 hours a day, but I saw her active on Instagram at 2 AM. Consistency is what counts."
+    ],
+    assignment: [
+      "Do not leave writing until the final night before submission. Steady handwriting with black ink shows respect for learning.",
+      "Late submissions attract mark penalties or repeat fees. Finish early so you don't spend money on emergency colour printouts at midnight.",
+      "Format references properly, verify technical calculations, and keep a backup copy on Google Drive and a USB drive.",
+      "Draft submissions must undergo spellcheck and structural verification before final filing with the department head.",
+      "Three classmates copied the exact same Wikipedia paragraph for their assignment; the professor gave zero to all three and called their parents."
+    ],
+    project: [
+      "Choose a topic that genuinely helps people, not just fancy words to impress outsiders. Hard work always bears fruit.",
+      "Track all project hardware, printing, and component costs among group members. Money disputes ruin final year project teams.",
+      "Define clear milestones, deliverables, and a fallback demo. If your live prototype fails during external viva, have recorded video proof ready.",
+      "Group project charter must clearly specify individual member responsibilities to avoid freeloading.",
+      "Anand's project team had four boys: two did all the circuit soldering, one bought tea, and one just put his name on the cover page."
+    ],
+    college: [
+      "Respect your teachers, make good friends who encourage your studies, and never skip lunch between classes.",
+      "Verify tuition fees, hostel charges, and campus placement records before choosing any institution or elective.",
+      "Focus on practical lab skills and industrial certifications alongside your degree syllabus. Degrees open doors, but competence keeps the job.",
+      "College attendance must be maintained above 85% to prevent disciplinary notices and condonation fines.",
+      "Saritha changed colleges twice because her friends went elsewhere; she lost one whole academic year and her parents are still explaining it."
+    ],
+    class: [
+      "Sit in the front two rows, listen carefully, and take notes by hand. An attentive mind catches what textbooks miss.",
+      "Tuition and semester fees are paid with hard-earned money. Missing classes is like throwing hundred rupee notes out the window.",
+      "Clear your conceptual doubts directly with the lecturer immediately after class. Backlogs start with one unasked question.",
+      "Bunking classes to sit in the canteen is a direct violation of student code of conduct. Attendance register will be inspected.",
+      "The boys who spend class hours sitting on the bridge near the tea stall were spotted by the ward member yesterday. News reached their homes."
+    ],
+    coding: [
+      "Staring at black screens with tiny green letters gives severe neck strain. Take five-minute breaks and wash your eyes with rose water.",
+      "Software skills pay well, but don't spend thousands on bootcamps when official documentation and free tutorials exist.",
+      "Write clean modular code, commit frequently with meaningful git messages, and write unit tests. In Gulf enterprise software, spaghetti code got contractors fired.",
+      "All software development projects must adhere to documentation standards and intellectual property bylaws.",
+      "Anoop claimed he was coding complex algorithms all night; his sister checked his monitor and he was customizing desktop wallpapers."
+    ],
+
+    // Relationships
+    girlfriend: [
+      "Respect her family, speak honestly, and remember that genuine affection needs patience, good manners, and prayer.",
+      "Expensive dates and fancy gifts every weekend are not financial planning. Build your career first so you have stability together.",
+      "Clear communication and emotional bandwidth are critical. If your emotional server has memory leaks, debug the core issues calmly.",
+      "Matters of the heart must be handled with maturity, mutual respect, and decorum before public announcements.",
+      "Someone saw the two of you talking near the beach walkway on Sunday; the news hasn't reached your grandmother yet, but hurry up and be sensible."
+    ],
+    boyfriend: [
+      "Observe how he treats his mother and elders; that tells you everything about his character and upbringing.",
+      "Does he have steady savings, career ambition, and respect for household finances? Sweet words don't pay electricity bills.",
+      "Check reliability and consistency under pressure. A partner who panics or disappears during basic crises is not production ready.",
+      "Relationship commitments require alignment on future plans, responsibilities, and long-term domestic coordination.",
+      "Geetha's daughter's boyfriend promised he had a Gulf visa; turned out he was just working in a courier office in Ernakulam. Verify everything."
+    ],
+    crush: [
+      "Infatuation comes and goes like monsoon rain. Focus on your work and exams first; what is meant for you will not pass you by.",
+      "Don't spend your pocket money on gifts or mobile recharges for someone who hasn't even acknowledged your existence.",
+      "Evaluate the signal-to-noise ratio. If there are no positive response packets coming back, terminate the transmission.",
+      "Unrequited romantic overtures must not distract from your primary academic or professional responsibilities.",
+      "You've been staring at their gate every time you take the cycle out. Believe me, the neighbours have already noticed."
+    ],
+    dating: [
+      "Meet in reputable public places, be courteous, and never compromise your values for temporary fashion.",
+      "Keep dating expenses within a sensible budget. Splurging on expensive cafes to impress someone is financially imprudent.",
+      "Look for compatibility in core values, problem-solving approaches, and lifestyle expectations. Don't rush into commitments without testing compatibility.",
+      "Personal conduct during courtship must reflect dignity and mutual accountability at all times.",
+      "Shyam went on two dates from an app and told the whole juice shop; when it didn't work out, everyone in the colony knew before him."
+    ],
+    relationship: [
+      "When arguments happen, sit down together, drink tea, and speak softly. Anger never solved any family dispute.",
+      "Joint financial transparency is the secret to long marriages. Discuss loans, savings, and expectations openly.",
+      "Relationships require preventative maintenance and regular calibration. Don't let unresolved grievances build up until total system crash.",
+      "Disputes should be resolved through structured dialogue rather than emotional escalation or third-party interference.",
+      "Every house has arguments, but keeping your voices low ensures the whole compound doesn't have evening entertainment."
+    ],
+
+    // Shopping
+    clothes: [
+      "Buy comfortable cotton clothes that last multiple washes. Dressing neatly and modestly is better than chasing weekly trends.",
+      "Check if your wardrobe already has five shirts of the exact same shade. Don't fall for festive discount sales you don't need.",
+      "Inspect fabric blend, stitching durability, and colour fastness before buying. Fast-fashion garments fall apart after three wash cycles.",
+      "Apparel acquisitions must be verified against current inventory to prevent redundant wardrobe clutter.",
+      "Sujatha bought an expensive designer salwar for a wedding; three other aunties were wearing identical prints from the same textile shop."
+    ],
+    furniture: [
+      "Solid teak or rosewood lasts three generations. These lightweight compressed-wood items swell up the moment rain comes.",
+      "Measure your living room floor space twice before signing the EMI agreement. Big sofas look small in air-conditioned showrooms.",
+      "Check load-bearing joints, cushion foam density (minimum 32 density), and termite treatment warranty.",
+      "Large furniture additions require consensus from all residents sharing the common living area.",
+      "Unni bought a huge L-shaped sofa online; it was so wide they had to remove the front window grill just to carry it inside."
+    ],
+    expensive_purchase: [
+      "Will this expensive thing bring peace of mind, or just anxiety about scratches, dust, and theft? Simplicity is true wealth.",
+      "Compare the purchase amount against your yearly savings rate. If one purchase wipes out six months of hard work, walk away.",
+      "Conduct a thorough cost-benefit analysis. High capital expenditure must deliver proportional productivity returns.",
+      "Expenditures in the luxury bracket must be justified with a detailed impact assessment on household liquidity.",
+      "Pradeep bought an imported coffee espresso machine; used it twice, and now it sits next to the mixer grinder collecting dust."
+    ],
+    shopping: [
+      "Make a strict list on paper before entering the market. If it is not on the paper, it does not belong in the bag.",
+      "A 50% discount on something you don't need is still 100% money wasted. Wait 48 hours before purchasing.",
+      "Distinguish between essential operational requirements and decorative nice-to-haves. Prioritise utility over impulse.",
+      "All domestic procurements above one thousand rupees require prior household budgetary sanction.",
+      "Lilly went to the supermarket just to buy coriander leaves and came back with three bags of biscuits and plastic containers."
+    ],
+
+    // Money
+    loan: [
+      "Debt is a heavy stone around the neck that steals sleep. In our time, we bought only when cash was in hand.",
+      "Look at the reducing balance interest rate, processing charges, and foreclosure penalties. Never take an unsecured loan for consumption.",
+      "Stress-test your cash flow: if your primary income pauses for three months, can your contingency fund service the loan?",
+      "Credit applications must be tabled before the household finance committee with verified repayment schedules.",
+      "Joy took a private loan to show off at his niece's betrothal; now the recovery agent's bike is parked outside his gate every Monday."
+    ],
+    emi: [
+      "Small monthly cuts bleed the salary dry before the tenth of the month. Save first, purchase later.",
+      "Zero percent EMI always hides processing fees and inflated base prices. Keep total EMIs under 30% of your take-home pay.",
+      "Calculate total cost of ownership across the entire tenure. Do not commit future cash flows to rapidly depreciating assets.",
+      "Long-term recurring payment liabilities must be entered into the family balance sheet with due notice.",
+      "Deepak has EMIs for his phone, TV, fridge, and gym watch; he drinks black tea at the junction because his wallet is always empty."
+    ],
+    savings: [
+      "Keep emergency cash in a safe tin or post office deposit. When hard times arrive, gold and liquid savings protect the home.",
+      "Transfer at least 20% of your earnings to savings on the day salary is credited, not whatever scraps are left at month-end.",
+      "Maintain a six-month emergency liquidity buffer in sweep-in FDs before exploring high-risk investment avenues.",
+      "The thrift and credit scheme remains the bedrock of family self-reliance as outlined in Kudumbashree guidelines.",
+      "Santha saved little by little in her chit fund for five years without telling her husband; when his scooter engine died, she funded the repair like a queen."
+    ],
+    investment: [
+      "Beware of anyone promising double money in three years. Put your trust in land, gold, or bank deposits, not smooth-talking agents.",
+      "Diversify across index mutual funds, recurring deposits, and sovereign gold bonds. Understand the risk before parting with capital.",
+      "Analyze historical compound annual growth rate and expense ratios. Never invest in asset classes whose underlying revenue model you cannot explain.",
+      "High-yield speculative schemes without RBI or SEBI accreditation are summarily prohibited under ward consumer directives.",
+      "Remember that financial company near the railway station that promised 24% interest? Closed overnight and the manager ran away to Coimbatore."
+    ],
+
+    // Travel
+    destinations: [
+      "Whether you travel to Dubai, Goa, or Bangalore, always respect local customs and eat food that agrees with your stomach.",
+      "Tourist hubs have inflated prices for everything from bottled water to auto rickshaws. Negotiate rates beforehand.",
+      "Research climate, local transportation connectivity, and power adapter standards before landing. Always keep local emergency numbers.",
+      "Interstate or international transit requires adherence to travel advisories and health protocols.",
+      "Everyone who visits Dubai comes back with the exact same box of dates, chocolates, and perfume bottles to distribute in the ward."
+    ],
+    trip: [
+      "Travel safely, pray before leaving the doorstep, and pack homemade snacks and boiled water so you don't fall sick outside.",
+      "Set a strict per-day budget for lodging, fuel, and meals. Road trips always end up costing 30% more than initial estimates.",
+      "Check tyre pressure, radiator coolant, tool kit, and download offline route maps before departing. Have a breakdown contact handy.",
+      "Trip itineraries and emergency contact coordinates must be filed with trusted neighbours before departure.",
+      "Four boys went on a sudden road trip to Vagamon without warm sweaters; spent the whole night shivering inside their car and returned with head colds."
+    ],
+    vacation: [
+      "Take rest, breathe fresh air, and spend peaceful time with loved ones. Don't turn a holiday into an exhausting marathon of clicking photos.",
+      "Book train tickets and hotel stays months in advance to avoid surge pricing and premium booking penalties.",
+      "Plan realistic travel buffers between destinations. Tight schedules create stress and increase mechanical failure risks.",
+      "Leave applications and work handovers must be properly signed off before embarking on recreational leave.",
+      "Syamala's family went on an all-inclusive holiday package; the hotel was under renovation and their room overlooked a pile of bricks."
+    ],
+    travel: [
+      "Carry your essential medicines, light clothing, and keep your bag locked. Travel broadens the mind when done with care.",
+      "Calculate total flight, cab, hotel, and meal costs together. Cheap airfare with expensive taxi rides is a common calculation mistake.",
+      "Keep digital copies of IDs and tickets in cloud storage and offline on your handset. Check transit terminal requirements beforehand.",
+      "Travel plans requiring extended absence from the ward require notification to the neighbourhood watch committee.",
+      "Haridas lost his passport copy at the airport lounge because he was busy taking selfies near the duty-free shop. Keep alert."
+    ],
+
+    // Health/Exercise
+    gym: [
+      "Lift carefully, don't strain your back, and remember that traditional surya namaskar and morning walking cost zero rupees.",
+      "Paying for a one-year annual gym membership when you only attend for six days in January is pure donation to the gym owner.",
+      "Prioritise form and biomechanics over lifting heavy weights for social media clips. Tendon injuries take months to debug.",
+      "Physical training schedules must be sustained regularly; sporadic attendance constitutes a breach of personal discipline.",
+      "Vivek bought fluorescent gym shoes, matching shaker bottle, and gloves; stopped going after the third day because his legs were sore."
+    ],
+    workout: [
+      "Warm up your joints properly with gentle stretching, and drink warm water with lemon and honey afterwards.",
+      "You don't need expensive equipment or fancy clothes to stay fit. Push-ups, squats, and brisk walking are completely free.",
+      "Track progressive overload, heart rate zones, and rest intervals. Recovery sleep is where muscle protein synthesis actually happens.",
+      "Physical conditioning routines must be documented and practiced safely without disrupting domestic morning routines.",
+      "The youths doing calisthenics on the playground pull-up bars spend 10 minutes exercising and 45 minutes adjusting their phone camera angles."
+    ],
+    running: [
+      "Run on soft mud paths rather than hard tar roads to protect your knee joints, and apply warm sesame oil if heels hurt.",
+      "Invest in one pair of durable, supportive running shoes; medical bills for plantar fasciitis cost far more than good footwear.",
+      "Maintain consistent cadence (around 170-180 SPM) and stay hydrated with electrolyte balance during humid Kerala mornings.",
+      "Jogging along public thoroughfares must follow traffic rules and reflective gear norms during dawn hours.",
+      "Girish started marathon training in the morning; chased by two stray dogs at the junction and set his personal sprint record."
+    ],
+    diet: [
+      "Eat balanced home-cooked meals on time with seasonal vegetables, drumstick leaves, and buttermilk. Starving yourself is not health.",
+      "Fancy diet foods and imported seeds burn money unnecessarily. Local millets, green gram, and farm eggs give twice the nutrition at half the price.",
+      "Calculate your basal metabolic rate and track macro ratios (protein, complex carbs, healthy fats). Sustainable caloric deficits beat crash diets.",
+      "Dietary adjustments must be gradual and certified safe by recognized clinical standards, not internet influencers.",
+      "Pushpa started a zero-carb keto diet on Monday; by Wednesday afternoon she was secretly eating hot parottas behind the kitchen door."
+    ],
+    exercise: [
+      "Thirty minutes of brisk walking in fresh morning air accompanied by deep breathing settles blood pressure and clears the mind.",
+      "Staying physically active prevents massive hospital bills in later years. It is the highest returning health insurance you can own.",
+      "Consistency of cardiovascular conditioning yields compounding health dividends. Maintain 150 minutes of moderate activity weekly.",
+      "Community wellness starts with personal accountability. Daily exercise targets should be maintained diligently.",
+      "The neighbourhood walking group at 6 AM spends the first ten minutes walking and the next forty minutes discussing who got engaged."
+    ],
+
+    // Neighbours/Family
+    parking: [
+      "Park with consideration for others. If your vehicle blocks someone's gate, speak politely and move it with a smile.",
+      "Scratches, dent repairs, and disputes with neighbours over parking spots cost both peace of mind and hard cash.",
+      "Park within clearly marked boundary lines and fold your side mirrors. Keep turning radius clear for emergency service vehicles.",
+      "Obstructing common access pathways violates ward traffic ordinance section 9. Designated bays must be respected.",
+      "Mathew parked his car two inches into Thomas's pathway; both families haven't spoken to each other since last Christmas."
+    ],
+    neighbour: [
+      "A good neighbour is closer than a distant relative in an emergency. Share a bowl of payasam and maintain sweet speech.",
+      "Compound wall repairs and boundary disputes drag on for years in civil court. A compromise over a cup of tea is far cheaper.",
+      "Establish clear technical boundary markers with mutual survey sign-off. Ambiguity in shared infrastructure always leads to conflict.",
+      "Neighbourhood grievances should be submitted in writing to the ward conciliation cell before escalating to law enforcement.",
+      "I already know what the issue is: the tree branches dropping leaves into their courtyard. Trim the branch and end the drama."
+    ],
+    parents: [
+      "Listen with patience to your father and mother. Their advice comes from decades of life experience and selfless affection.",
+      "Ensure your parents have active medical insurance and emergency funds. Taking care of their health is your primary duty.",
+      "Systemic family stability relies on open communication channels. Do not dismiss elderly concerns as legacy system obsolescence.",
+      "Elder care and respectful domestic coordination are mandatory principles under community welfare bylaws.",
+      "Children who respect their parents are praised across the entire ward; those who argue loudly are discussed at the grocery store."
+    ],
+    relatives: [
+      "Relatives will have many opinions on your life. Smile, serve them warm tea and banana chips, and quietly do what is right.",
+      "Never lend money to distant relatives without clear repayment terms unless you are prepared to write it off as a gift.",
+      "Filter unsolicited advice through objective logic gates. Accept constructive feedback and discard emotional noise.",
+      "Family councils should be conducted with order, allowing all parties to register points without disruptive shouting.",
+      "Every relative has an opinion until it is time to contribute money or help with work; then their phones suddenly go out of coverage."
+    ],
+    family: [
+      "A peaceful home where everyone eats together and speaks kindly is the greatest blessing in the world.",
+      "Maintain a joint household emergency reserve and transparent monthly budgeting to keep family harmony secure.",
+      "A well-run household functions like a synchronized distributed system. Regular family briefings prevent operational bottlenecks.",
+      "Domestic disputes must be addressed internally with decorum before external committee mediation is required.",
+      "When a family stands united, no gossip in the ward can touch them. Settle your differences at home first."
+    ]
+  };
+
+  const subjectVerdicts = {
+    gaming_laptop: [
+      "Verdict: gaming laptop is conditionally approved only if graphics cooling, legitimate study/work utility, and warranty are confirmed without high-interest EMI.",
+      "Verdict: verify whether heavy gaming hardware is an educational requirement or an expensive distraction before purchase."
+    ],
+    laptop: [
+      "Verdict: laptop purchase is approved for verified academic or professional requirements with sensible memory specifications and price comparison.",
+      "Verdict: service the current machine first; upgrade to a new laptop only if software requirements exceed hardware capability."
+    ],
+    gaming_pc: [
+      "Verdict: custom desktop build approved only with a certified surge protector, power backup, and written budget limits.",
+      "Verdict: reconsider assembling a high-power gaming desktop until household electrical capacity and cooling requirements are verified."
+    ],
+    desktop: [
+      "Verdict: desktop workstation approved for family or study use with proper ergonomics and reliable UPS power backup.",
+      "Verdict: procure a desktop computer only after designated workspace and genuine workflow needs are established."
+    ],
+    phone: [
+      "Verdict: retain or repair the current handset unless battery failure, screen damage, or security updates demand immediate replacement.",
+      "Verdict: phone upgrade approved strictly on upfront budget without entering 24-month zero-downpayment credit traps."
+    ],
+    tablet: [
+      "Verdict: tablet purchase approved if distinct from existing phone and laptop utility, with focus on reading and note-taking.",
+      "Verdict: defer tablet acquisition until it is proven it will not become an expensive video player at the dinner table."
+    ],
+    headphones: [
+      "Verdict: budget headphones approved with strict decibel volume warnings to protect hearing.",
+      "Verdict: purchase durable wired or basic wireless earphones; reject overpriced luxury audio accessories."
+    ],
+    tv: [
+      "Verdict: television upgrade approved provided screen size matches room dimensions and does not interrupt evening study hours.",
+      "Verdict: repair existing television set if possible; delay large-screen purchase until festive season discounts."
+    ],
+    console: [
+      "Verdict: gaming console purchase conditionally approved with pre-agreed weekly hour limits and independent funding.",
+      "Verdict: gaming console rejected until semester exams are completed and domestic responsibilities are fully met."
+    ],
+    scooter: [
+      "Verdict: scooter purchase approved provided on-road cost, safety helmet, insurance, and regular maintenance are budgeted.",
+      "Verdict: test ride and compare mileage figures across service networks before booking any new scooter model."
+    ],
+    bike: [
+      "Verdict: motorcycle approved subject to strict adherence to speed limits, protective riding gear, and sensible fuel consumption.",
+      "Verdict: reject loud or overpowered motorcycles; approve reliable commuter two-wheelers with dual-channel ABS."
+    ],
+    car: [
+      "Verdict: four-wheeler approved only if dedicated off-street parking, comprehensive insurance, and running maintenance are secured.",
+      "Verdict: postpone new car acquisition if loan EMI exceeds 20% of net household earnings."
+    ],
+    ev: [
+      "Verdict: electric vehicle approved provided dedicated home 15A charging socket and battery warranty coverage are verified.",
+      "Verdict: confirm daily commute range and local charging infrastructure before transitioning to an electric vehicle."
+    ],
+    biryani: [
+      "Verdict: biryani order approved if household dinner preparation has failed, provided portions are shared responsibly.",
+      "Verdict: postpone restaurant biryani; prepare a simple nourishing home meal to save both money and digestion."
+    ],
+    pizza: [
+      "Verdict: pizza approved as an occasional celebration item only, not as a replacement for standard dinner.",
+      "Verdict: outside fast food deferred; examine home pantry provisions before placing app delivery orders."
+    ],
+    burger: [
+      "Verdict: burger snack permitted occasionally; avoid adding unnecessary sugary beverage combos.",
+      "Verdict: opt for wholesome domestic snacks; curb recurring fast-food delivery habits."
+    ],
+    restaurant: [
+      "Verdict: restaurant dining approved for special occasions with fixed expense ceiling and verified hygiene standards.",
+      "Verdict: home dining remains the default policy; outside restaurant visits curtailed to protect monthly savings."
+    ],
+    cooking: [
+      "Verdict: home cooking strongly approved using seasonal market ingredients, traditional spices, and minimal wastage.",
+      "Verdict: prepare food at home with measured quantities to sustain health, family bonding, and household economy."
+    ],
+    exam: [
+      "Verdict: cease all social media activity immediately, review past examination papers, sleep 7 hours, and write with calm confidence.",
+      "Verdict: structured revision of core chapters approved; panic study and late-night cramming are strictly forbidden."
+    ],
+    studying: [
+      "Verdict: commit to scheduled daily study blocks with regular intervals; consistency surpasses last-minute panic.",
+      "Verdict: academic study plan approved with designated quiet hours and mobile notifications silenced."
+    ],
+    assignment: [
+      "Verdict: complete assignment research and drafting immediately to avoid midnight printing and submission penalties.",
+      "Verdict: verify original sources and calculations; submit well in advance of the departmental deadline."
+    ],
+    project: [
+      "Verdict: project execution approved with clear division of labour, technical backup documentation, and prototype testing.",
+      "Verdict: complete project deliverables early and maintain working video demonstrations before external evaluation."
+    ],
+    college: [
+      "Verdict: prioritize accredited courses with strong faculty, practical exposure, and transparent placement histories.",
+      "Verdict: educational decisions approved following thorough review of curriculum, fees, and long-term career viability."
+    ],
+    class: [
+      "Verdict: maintain consistent classroom attendance and active participation; clarify conceptual doubts without delay.",
+      "Verdict: regular attendance mandated; avoid unauthorized absenteeism and canteen lingering during lecture hours."
+    ],
+    coding: [
+      "Verdict: write modular, well-tested code with proper git commits and documentation; solve core logic step-by-step.",
+      "Verdict: software development plan approved with continuous backup protocols and code quality reviews."
+    ],
+    girlfriend: [
+      "Verdict: proceed with mutual respect, open communication, patience, and clear alignment on life goals.",
+      "Verdict: nurture relationship with emotional maturity and honesty while maintaining individual career focus."
+    ],
+    boyfriend: [
+      "Verdict: assess character, emotional reliability, and mutual respect before taking major life decisions.",
+      "Verdict: open discussion approved regarding future responsibilities, family expectations, and financial stability."
+    ],
+    crush: [
+      "Verdict: maintain dignity and focus on personal growth; express feelings honestly or move forward without lingering distraction.",
+      "Verdict: prioritize studies and self-improvement over obsessive speculation; what is genuine will find its right time."
+    ],
+    dating: [
+      "Verdict: courtship approved in safe environments with mutual dignity, realistic expectations, and sensible personal boundaries.",
+      "Verdict: take time to understand core values and temperament before committing to long-term promises."
+    ],
+    relationship: [
+      "Verdict: resolve misunderstandings through calm face-to-face dialogue over tea; avoid third-party interference.",
+      "Verdict: commit to mutual listening, shared responsibilities, and emotional honesty to strengthen the bond."
+    ],
+    clothes: [
+      "Verdict: clothing purchase approved for genuine need and durability; avoid impulsive trend-chasing.",
+      "Verdict: audit existing wardrobe first; purchase only versatile, high-quality garments within budget."
+    ],
+    furniture: [
+      "Verdict: furniture acquisition approved after verifying room measurements, timber quality, and ergonomic comfort.",
+      "Verdict: choose durable solid craftsmanship over flimsy compressed-board display pieces."
+    ],
+    expensive_purchase: [
+      "Verdict: luxury capital expenditure deferred until debt-free status and six months of contingency reserves are secured.",
+      "Verdict: evaluate return on utility; approve expensive purchase only if durability and genuine need justify the cost."
+    ],
+    shopping: [
+      "Verdict: purchase approved only if on the pre-written shopping list and within allocated liquid funds.",
+      "Verdict: enforce a 24-hour waiting period before non-essential purchases to prevent retail buyer's remorse."
+    ],
+    loan: [
+      "Verdict: borrowing approved only for productive capital investments with verified low interest and repayment capability.",
+      "Verdict: reject high-interest personal loans and consumption borrowing; protect long-term financial independence."
+    ],
+    emi: [
+      "Verdict: EMI commitments approved only if total monthly debt servicing remains strictly under 25% of net income.",
+      "Verdict: decline deferred payment options for depreciating consumer items; save upfront and buy outright."
+    ],
+    savings: [
+      "Verdict: prioritize automated monthly savings into secure instruments before allocating discretionary spending.",
+      "Verdict: protect emergency savings reserves; avoid withdrawing principal capital for temporary desires."
+    ],
+    investment: [
+      "Verdict: invest in diversified, regulated instruments with transparent track records; reject speculative get-rich schemes.",
+      "Verdict: review asset allocation, risk tolerance, and investment horizon before deploying household capital."
+    ],
+    trip: [
+      "Verdict: trip approved with confirmed itinerary, vehicle safety inspection, and emergency cash reserves.",
+      "Verdict: plan route and accommodations carefully; avoid impulsive excursions during peak adverse weather."
+    ],
+    vacation: [
+      "Verdict: vacation approved for genuine rest and family reconnection within pre-funded holiday savings.",
+      "Verdict: schedule relaxation without overbooked itineraries; keep travel expenses within sensible boundaries."
+    ],
+    travel: [
+      "Verdict: travel approved with advance bookings, verified transit documents, and cloud backups of all essentials.",
+      "Verdict: travel light, stay alert, and maintain contingency buffer time between connections."
+    ],
+    destinations: [
+      "Verdict: destination travel approved following off-peak price comparison and verified accommodation safety.",
+      "Verdict: research local conditions, transport tariffs, and dietary options before departure."
+    ],
+    gym: [
+      "Verdict: gym membership approved on monthly or quarterly trial basis to ensure consistent attendance before annual lock-in.",
+      "Verdict: focus on basic progressive strength and cardiovascular training with certified coaching guidance."
+    ],
+    workout: [
+      "Verdict: structured physical conditioning approved with proper warmup, progressive loading, and adequate recovery sleep.",
+      "Verdict: maintain safe lifting technique and mobility; reject ego-lifting and unsafe workout routines."
+    ],
+    running: [
+      "Verdict: running regimen approved with shock-absorbing footwear, gradual distance progression, and joint care.",
+      "Verdict: alternate running days with mobility and rest to prevent shin splints and repetitive stress injuries."
+    ],
+    diet: [
+      "Verdict: adopt sustainable whole-food nutrition with seasonal greens, lentils, and hydration; avoid extreme crash diets.",
+      "Verdict: consult qualified nutritional guidance; build lifelong healthy eating habits rather than short-term deprivation."
+    ],
+    exercise: [
+      "Verdict: thirty minutes of daily brisk walking and functional movement approved as foundational preventive healthcare.",
+      "Verdict: daily active movement approved; prioritize consistency and enjoyment over sporadic intensity."
+    ],
+    parking: [
+      "Verdict: park strictly within demarcated bays with mirrors folded, leaving access paths unobstructed for neighbours.",
+      "Verdict: resolve parking disputes through calm direct agreement and mutual consideration."
+    ],
+    neighbour: [
+      "Verdict: resolve boundary and neighbourhood differences through respectful conversation and shared tea before escalating.",
+      "Verdict: maintain friendly civic boundaries and quiet hours to preserve collective neighbourhood tranquility."
+    ],
+    parents: [
+      "Verdict: communicate with warmth, respect, and patience; honour parents' guidance while sharing perspectives calmly.",
+      "Verdict: prioritize parental well-being, healthcare, and active family companionship."
+    ],
+    relatives: [
+      "Verdict: welcome extended family with gracious hospitality, but maintain independent boundaries on personal choices.",
+      "Verdict: listen courteously to relative suggestions, filter through practical reason, and proceed peacefully."
+    ],
+    family: [
+      "Verdict: uphold household unity through transparent discussions, shared responsibilities, and mutual affection.",
+      "Verdict: family harmony takes precedence; address domestic concerns with patience and shared understanding."
+    ]
+  };
+
+  const subjectDebateTopics = {
+    gaming_laptop: "this gaming laptop purchase",
+    laptop: "this laptop purchase",
+    gaming_pc: "this gaming PC build",
+    desktop: "this desktop computer",
+    phone: "this phone purchase",
+    tablet: "this tablet purchase",
+    headphones: "these headphones",
+    tv: "this television upgrade",
+    console: "this gaming console",
+    scooter: "this scooter purchase",
+    bike: "this motorcycle purchase",
+    car: "this car purchase",
+    ev: "this electric vehicle purchase",
+    biryani: "ordering biryani",
+    pizza: "ordering pizza",
+    burger: "ordering burgers",
+    restaurant: "eating outside food",
+    cooking: "this cooking decision",
+    exam: "this exam preparation",
+    studying: "this study routine",
+    assignment: "this assignment",
+    project: "this project work",
+    college: "this college decision",
+    class: "attending class",
+    coding: "this coding work",
+    girlfriend: "this relationship with your girlfriend",
+    boyfriend: "this relationship with your boyfriend",
+    crush: "this crush matter",
+    dating: "this dating plan",
+    relationship: "this relationship matter",
+    clothes: "buying new clothes",
+    furniture: "this furniture purchase",
+    expensive_purchase: "this expensive purchase",
+    shopping: "this shopping plan",
+    loan: "taking this loan",
+    emi: "this EMI commitment",
+    savings: "touching your savings",
+    investment: "this investment plan",
+    trip: "this trip",
+    vacation: "this vacation",
+    travel: "this travel plan",
+    destinations: "travelling there",
+    gym: "this gym membership",
+    workout: "this workout plan",
+    running: "this running routine",
+    diet: "this diet plan",
+    exercise: "this exercise routine",
+    parking: "this parking issue",
+    neighbour: "this neighbour dispute",
+    parents: "this family matter with parents",
+    relatives: "this matter with relatives",
+    family: "this family decision"
+  };
+
+  const subjectAppealTopics = {
+    gaming_laptop: "the gaming laptop purchase and its thermal and budget justification",
+    laptop: "the laptop purchase and its actual productivity necessity",
+    gaming_pc: "the custom PC build, power consumption, and total cost",
+    desktop: "the desktop computer purchase and household utility",
+    phone: "the phone upgrade and whether the current handset can continue",
+    tablet: "the tablet purchase and its intended educational value",
+    headphones: "the earphone purchase and sound budget limits",
+    tv: "the television upgrade and its impact on household routine",
+    console: "the gaming console acquisition and study hour restrictions",
+    scooter: "the scooter purchase, on-road price, and safety verification",
+    bike: "the motorcycle purchase, fuel efficiency, and road safety",
+    car: "the car purchase, EMI commitments, and parking availability",
+    ev: "the electric vehicle plan, charging logistics, and battery warranty",
+    biryani: "the biryani order and whether dinner was already prepared at home",
+    pizza: "the pizza order and unnecessary food delivery expenditure",
+    burger: "the fast-food order and sensible meal planning",
+    restaurant: "dining out instead of utilizing home kitchen provisions",
+    cooking: "the home cooking plan and kitchen inventory management",
+    exam: "the upcoming examination and immediate focus on revision",
+    studying: "the study schedule and daily discipline verification",
+    assignment: "the assignment submission deadline and reference checks",
+    project: "the final year project deliverables and team contributions",
+    college: "the academic enrollment and future career outcomes",
+    class: "class attendance records and tuition fee utilization",
+    coding: "the software development work and documentation standards",
+    girlfriend: "the relationship matter and emotional maturity",
+    boyfriend: "the relationship matter and practical family alignment",
+    crush: "the romantic preoccupation and focus on core responsibilities",
+    dating: "the courtship plan and adherence to mutual dignity",
+    relationship: "the domestic relationship dispute and calm dialogue",
+    clothes: "the clothing purchase and wardrobe necessity audit",
+    furniture: "the furniture purchase and living space measurements",
+    expensive_purchase: "the luxury capital expense and liquidity impact",
+    shopping: "the shopping expedition and budget adherence",
+    loan: "the credit borrowing application and interest rate analysis",
+    emi: "the monthly EMI liability and long-term repayment risk",
+    savings: "the savings withdrawal and emergency fund preservation",
+    investment: "the investment proposal and verified regulatory backing",
+    trip: "the road trip itinerary and vehicle preparedness",
+    vacation: "the holiday booking and travel budget constraints",
+    travel: "the travel itinerary and emergency contingency planning",
+    destinations: "the travel destination and off-season expense review",
+    gym: "the gym subscription and attendance commitment",
+    workout: "the workout conditioning routine and injury prevention",
+    running: "the running regimen and proper joint protection",
+    diet: "the nutritional plan and sustainable dietary habits",
+    exercise: "the physical fitness routine and daily continuity",
+    parking: "the parking disagreement and common lane obstruction",
+    neighbour: "the neighbourhood boundary matter and conciliation efforts",
+    parents: "the discussion with parents and respectful communication",
+    relatives: "the family council matter and unnecessary external interference",
+    family: "the family consensus and domestic harmony"
+  };
+
+  function detectSubject(problem){
+    const match = subjects.find(([, , pattern]) => pattern.test(problem));
+    return match ? { subject: match[0], category: match[1] } : null;
+  }
+
+  function detectCategory(problem){
+    const sub = detectSubject(problem);
+    if (sub) return sub.category;
+    const match = categories.find(([, pattern]) => pattern.test(problem));
+    return match ? match[0] : "general";
+  }
+
+  function memberOpinion(problem, memberIndex){
+    const sub = detectSubject(problem);
+    if (sub && subjectRules[sub.subject]){
+      return pick(opinionOpeners[memberIndex]) + subjectRules[sub.subject][memberIndex];
+    }
+    const category = detectCategory(problem);
+    return pick(opinionOpeners[memberIndex]) + topicRules[category][memberIndex];
+  }
+
+  function committeeVerdict(problem){
+    const sub = detectSubject(problem);
+    if (sub && subjectVerdicts[sub.subject]){
+      return pick(subjectVerdicts[sub.subject]);
+    }
+    const category = detectCategory(problem);
+    const verdicts = {
+      electronics: ["Verdict: retain or repair the current device unless the required feature, price, and long-term support justify an upgrade.", "Verdict: a new device is approved only after comparing specifications, warranty, and budget."],
+      vehicles: ["Verdict: approve transport only after full running cost, safety, and service plans are satisfactory.", "Verdict: service the existing vehicle first; replace it only if the maintenance record and budget agree."],
+      food: ["Verdict: choose a practical, hygienic meal that fits both the stomach and the budget.", "Verdict: home food is the default; outside food may be considered after proper appetite verification."],
+      college: ["Verdict: proceed with a steady study plan, realistic course choice, and fewer last-minute emergencies.", "Verdict: approve the academic plan after checking fees, workload, and a sensible weekly schedule."],
+      relationships: ["Verdict: hold one honest, calm conversation before making a large emotional announcement.", "Verdict: proceed only with clear expectations, mutual respect, and a plan for ordinary life."],
+      shopping: ["Verdict: purchase is approved only if the item is needed, durable, and within budget.", "Verdict: wait 24 hours, compare options, then buy the useful version—not the flashy version."],
+      money: ["Verdict: protect savings, avoid rushed borrowing, and review the full repayment cost.", "Verdict: approve only after the budget, interest rate, and emergency reserve have been examined."],
+      travel: ["Verdict: travel is approved with a fixed budget, confirmed bookings, and one backup plan.", "Verdict: proceed after checking total cost, documents, and sufficient buffer time."],
+      health: ["Verdict: begin with a safe, sustainable routine and seek qualified medical advice when appropriate.", "Verdict: reject miracle solutions; approve consistent sleep, food, movement, and evidence-based care."],
+      neighbours: ["Verdict: attempt a calm direct conversation and involve the committee only if peace fails.", "Verdict: approve a practical boundary and a respectful meeting before this becomes ward-wide entertainment."],
+      general: ["Verdict: choose the simplest practical option after checking cost, consequences, and one backup plan.", "Verdict: the matter is approved for careful consideration, subject to tea, common sense, and paperwork."]
+    };
+    return pick(verdicts[category]);
+  }
+
+  const debateTopics = {
+    electronics: "this device purchase", vehicles: "this transport plan", food: "this food decision",
+    college: "this education plan", relationships: "this relationship matter", shopping: "this purchase",
+    money: "this financial proposal", travel: "this travel plan", health: "this health routine",
+    neighbours: "this neighbourhood issue", general: "this proposal"
+  };
+
+  const voteRules = {
+    electronics: ["NO", "CONDITIONAL", "YES", "CONDITIONAL", "YES"],
+    vehicles: ["CONDITIONAL", "NO", "YES", "CONDITIONAL", "YES"],
+    food: ["NO", "CONDITIONAL", "YES", "CONDITIONAL", "YES"],
+    college: ["YES", "CONDITIONAL", "YES", "CONDITIONAL", "YES"],
+    relationships: ["CONDITIONAL", "CONDITIONAL", "YES", "CONDITIONAL", "NO"],
+    shopping: ["NO", "CONDITIONAL", "YES", "CONDITIONAL", "YES"],
+    money: ["NO", "NO", "CONDITIONAL", "CONDITIONAL", "NO"],
+    travel: ["CONDITIONAL", "CONDITIONAL", "YES", "CONDITIONAL", "YES"],
+    health: ["YES", "CONDITIONAL", "YES", "CONDITIONAL", "CONDITIONAL"],
+    neighbours: ["YES", "CONDITIONAL", "YES", "CONDITIONAL", "NO"],
+    general: ["CONDITIONAL", "CONDITIONAL", "YES", "CONDITIONAL", "YES"]
+  };
+
+  function debateStatement(problem, memberIndex){
+    const sub = detectSubject(problem);
+    const topic = (sub && subjectDebateTopics[sub.subject])
+      ? subjectDebateTopics[sub.subject]
+      : debateTopics[detectCategory(problem)];
+    const statements = [
+      `I agree with the sensible parts, but ${topic} should be simple and genuinely necessary. Filter coffee first; decisions later.`,
+      `Before anyone says yes, I want the full cost written down. Even Pappan's backup plan has a price tag.`,
+      `Ammachi is right about keeping it simple, but we still need requirements, failure cases, and a backup plan.`,
+      `The points are noted. No decision on ${topic} can proceed until this committee records a proper resolution.`,
+      `I am only saying that two houses near the junction tried something similar, and both have opinions. The ward will know by tea time.`
+    ];
+    return statements[memberIndex];
+  }
+
+  function questionNature(problem){
+    const text = problem.toLowerCase();
+    const risky = /\b(huge|expensive|luxury|unnecessary|wasteful|impulsive|reckless|gambling|skip|cheat)\b/.test(text) ||
+      /\b(all|entire) (my )?(savings|money|salary)\b/.test(text) ||
+      /\b(loan|emi|debt)\b/.test(text) && /\b(big|huge|expensive|gaming|luxury)\b/.test(text);
+    const sensible = /\b(study|studying|exam|prepare|reasonable|affordable|budget|save|saving|repair|necessary|practical|plan|exercise|doctor|home)\b/.test(text);
+    return { risky, sensible };
+  }
+
+  function calculateVotes(problem){
+    const { risky, sensible } = questionNature(problem);
+
+    // Ammachi rejects excess; Saramma rejects financial risk; Pappan rejects
+    // impractical plans; Latha asks for approval; Beena considers ward fallout.
+    if (risky) return ["NO", "NO", "NO", "CONDITIONAL", "NO"];
+
+    // A genuinely useful, affordable, or well-planned proposal earns broad support.
+    if (sensible) return ["YES", "YES", "YES", "CONDITIONAL", "YES"];
+
+    // Neutral questions retain category-specific mixed votes and need more evidence.
+    return voteRules[detectCategory(problem)];
+  }
+
+  function voteOutcome(votes){
+    const count = (value) => votes.filter((vote) => vote === value).length;
+    const yes = count("YES");
+    const no = count("NO");
+    const conditional = count("CONDITIONAL");
+    if (yes >= 3) return { status: "APPROVED", yes, no, conditional };
+    if (no >= 3) return { status: "REJECTED", yes, no, conditional };
+    return { status: "CONDITIONALLY APPROVED", yes, no, conditional };
+  }
+
+  const appealAuthorities = [
+    { name: "Thankamma Madam", role: "Senior Kudumbashree Authority", color: "#7C1F2B" },
+    { name: "Babu Uncle", role: "Senior Practical Advisor", color: "#1D5C4B" },
+    { name: "Leelamma Ammachi", role: "Final Senior Authority", color: "#C79A3D" }
+  ];
+
+  const appealSteps = [
+    "Opening Appeal File...",
+    "Forwarding case to Area Committee...",
+    "Searching for the original application...",
+    "Consulting three additional relatives...",
+    "Calling an emergency meeting...",
+    "Calculating whether this problem is actually worth appealing...",
+    "Appeal committee has convened."
+  ];
+
+  const appealSubjects = {
+    electronics: "the device purchase and whether the old one still works",
+    vehicles: "the vehicle plan, its running cost, and its maintenance",
+    food: "the food decision, kitchen effort, and unnecessary parcels",
+    college: "the education plan and whether proper studying is happening",
+    relationships: "the relationship matter and its practical consequences",
+    shopping: "the purchase and whether it belongs in the house at all",
+    money: "the financial proposal, repayment, and household savings",
+    travel: "the trip, its budget, and whether the itinerary makes sense",
+    health: "the health routine and whether it is sensible to continue",
+    neighbours: "the neighbourhood matter before it becomes a ward issue",
+    general: "this proposal and the original committee's reasoning"
+  };
+
+  let latestCase = null;
+
+  function appealStatement(problem, originalStatus, authorityIndex){
+    const sub = detectSubject(problem);
+    const subject = (sub && subjectAppealTopics[sub.subject])
+      ? subjectAppealTopics[sub.subject]
+      : appealSubjects[detectCategory(problem)];
+    const statements = [
+      `Regarding ${subject}: the original finding of ${originalStatus} cannot be discussed without Form AC-12, purchase justification, and an official signature in blue ink.`,
+      `This appeal is about ${subject}. Why are we holding a second meeting? If it is practical, do it; if not, stop making files.`,
+      `For ${subject}, the original decision was ${originalStatus}. I knew the answer before the tea arrived: use common sense and do not waste what you have.`
+    ];
+    return statements[authorityIndex];
+  }
+
+  function appealVotes(problem, originalOutcome){
+    const { risky } = questionNature(problem);
+    const text = problem.toLowerCase();
+    const urgentNeed = /\b(emergency|medical|treatment|education|school fees)\b/.test(text);
+
+    // Serious need can overturn an otherwise cautious original rejection.
+    if (originalOutcome.status === "REJECTED" && urgentNeed) return ["OVERTURN", "OVERTURN", "OVERTURN"];
+    // Clearly excessive appeals are dismissed by all three authorities.
+    if (risky) return ["NO", "NO", "NO"];
+    // In ordinary cases the higher authority supports the existing result.
+    if (originalOutcome.status === "APPROVED") return ["YES", "YES", "YES"];
+    if (originalOutcome.status === "REJECTED") return ["NO", "NO", "NO"];
+    return ["YES", "OVERTURN", "YES"];
+  }
+
+  function appealOutcome(problem, originalOutcome, votes){
+    const overturns = votes.filter((vote) => vote === "OVERTURN").length;
+    const { risky } = questionNature(problem);
+    if (overturns >= 2){
+      const replacement = originalOutcome.status === "REJECTED" ? "APPROVED" : "REJECTED";
+      return { status: `ORIGINAL VERDICT OVERTURNED — ${replacement}`, text: `After 47 minutes of discussion, two cups of tea, one missing file, and an argument about the original application, the Area Committee has changed the decision to ${replacement}.` };
+    }
+    if (risky && votes.filter((vote) => vote === "NO").length >= 2){
+      return { status: "CASE DISMISSED", text: "After checking the file, the Area Committee finds this appeal more ambitious than sensible. The applicant is advised to stop appealing decisions that were already explained clearly." };
+    }
+    return { status: "ORIGINAL VERDICT UPHELD", text: `After 47 minutes of discussion, two cups of tea, and one unnecessary argument about the original application, the Area Committee confirms the original ${originalOutcome.status} decision.` };
+  }
+
+  async function runAppealTerminal(){
+    const terminal = $("appealTerminal");
+    const lines = $("appealLines");
+    lines.innerHTML = "";
+    terminal.style.display = "block";
+    for (const step of appealSteps){
+      const line = document.createElement("div");
+      line.className = "line";
+      line.textContent = "> " + step;
+      lines.appendChild(line);
+      await sleep(320);
+    }
+  }
+
+  function renderAppealCommittee(problem, originalOutcome){
+    const box = $("appealMembers");
+    box.innerHTML = "";
+    $("appealCaseSummary").textContent = `APPEAL OF: ${problem} | ORIGINAL STATUS: ${originalOutcome.status}`;
+    appealAuthorities.forEach((authority, i) => {
+      const card = document.createElement("div");
+      card.className = "appeal-authority";
+      card.style.setProperty("--member-color", authority.color);
+      card.style.animationDelay = (i * 0.15) + "s";
+      card.innerHTML = `<div><span class="name">${authority.name}</span> <span class="role">— ${authority.role}</span></div><div class="opinion">${appealStatement(problem, originalOutcome.status, i)}</div>`;
+      box.appendChild(card);
+    });
+    $("appealCommittee").style.display = "block";
+  }
+
+  function renderAppealVotes(votes){
+    const box = $("appealVotes");
+    box.innerHTML = "";
+    appealAuthorities.forEach((authority, i) => {
+      const card = document.createElement("div");
+      card.className = "appeal-vote-card";
+      card.style.setProperty("--member-color", authority.color);
+      card.style.animationDelay = (i * 0.12) + "s";
+      card.innerHTML = `<span class="voter">${authority.name}</span><span class="vote-value">${votes[i]}</span>`;
+      box.appendChild(card);
+    });
+    $("appealVote").style.display = "block";
+  }
+
+  function renderAppealDecision(problem, originalOutcome, votes){
+    const decision = appealOutcome(problem, originalOutcome, votes);
+    $("appealFileNo").textContent = $("fileNo").textContent;
+    $("appealDecisionText").textContent = decision.text;
+    $("appealStamp").textContent = decision.status;
+    $("appealDecision").style.display = "block";
+  }
+
+  function fileNumber(){
+    const n = Math.floor(1000 + Math.random() * 8999);
+    return `CASE FILE NO. KSC/2026/${n}  —  WARD 12`;
+  }
+
+  async function runTerminal(){
+    const terminal = $("terminal");
+    const linesBox = $("terminalLines");
+    const fill = $("progressFill");
+    linesBox.innerHTML = "";
+    fill.style.width = "0%";
+    terminal.style.display = "block";
+
+    for (let i = 0; i < loadingSteps.length; i++){
+      const div = document.createElement("div");
+      div.className = "line";
+      div.textContent = "> " + loadingSteps[i];
+      linesBox.appendChild(div);
+      fill.style.width = Math.round(((i + 1) / loadingSteps.length) * 100) + "%";
+      await sleep(420);
+    }
+    await sleep(300);
+    terminal.style.display = "none";
+  }
+
+  function renderCommittee(problem){
+    const box = $("members");
+    box.innerHTML = "";
+    members.forEach((m, i) => {
+      const card = document.createElement("div");
+      card.className = "member";
+      card.style.setProperty("--member-color", m.color);
+      card.style.setProperty("--tilt", m.tilt);
+      card.style.animationDelay = (i * 0.15) + "s";
+      card.innerHTML = `
+        <div class="who">
+          <span class="avatar">${m.avatar}</span>
+          <span class="name">${m.name}</span>
+          <span class="role">— ${m.role}</span>
+        </div>
+        <div class="opinion">${memberOpinion(problem, i)}</div>
+      `;
+      box.appendChild(card);
+    });
+    $("committee").style.display = "block";
+  }
+
+  function renderDebate(problem){
+    const box = $("debateLines");
+    box.innerHTML = "";
+    members.forEach((m, i) => {
+      const line = document.createElement("div");
+      line.className = "debate-line";
+      line.style.animationDelay = (i * 0.12) + "s";
+      line.innerHTML = `<strong>${m.name}:</strong> ${debateStatement(problem, i)}`;
+      box.appendChild(line);
+    });
+    $("deliberation").style.display = "block";
+  }
+
+  function renderVotes(problem){
+    const votes = calculateVotes(problem);
+    const box = $("votes");
+    box.innerHTML = "";
+    members.forEach((m, i) => {
+      const card = document.createElement("div");
+      card.className = "vote-card";
+      card.style.setProperty("--member-color", m.color);
+      card.style.animationDelay = (i * 0.12) + "s";
+      card.innerHTML = `<span class="voter">${m.avatar} ${m.name}</span><span class="vote-value">${votes[i]}</span>`;
+      box.appendChild(card);
+    });
+    $("voteSection").style.display = "block";
+    return votes;
+  }
+
+  function applyVoteVerdict(problem, votes){
+    const outcome = voteOutcome(votes);
+    $("verdictText").textContent = `${committeeVerdict(problem)} Vote tally: ${outcome.yes} YES, ${outcome.no} NO, ${outcome.conditional} CONDITIONAL.`;
+    $("verdict").querySelector(".stamp").textContent = outcome.status;
+    $("confidenceLine").textContent = `CONFIDENCE: ${100 + Math.floor(Math.random() * 60)}% | STATUS: ${outcome.status} (eventually)`;
+    const appealBtn = $("appealBtn");
+    appealBtn.style.display = "block";
+    appealBtn.disabled = false;
+    appealBtn.textContent = "APPEAL TO HIGHER AUTHORITY";
+  }
+
+  function renderVerdict(problem){
+    $("fileNo").textContent = fileNumber();
+    $("verdictText").textContent = committeeVerdict(problem);
+    const confidence = 100 + Math.floor(Math.random() * 60);
+    $("confidenceLine").textContent = `CONFIDENCE: ${confidence}%   ·   STATUS: APPROVED (unanimously, eventually)`;
+    $("verdict").style.display = "block";
+  }
+
+  // ---------- MAIN FLOW ----------
+  $("consultBtn").addEventListener("click", async () => {
+    const input = $("problemInput");
+    let problem = input.value.trim();
+    if (!problem){
+      input.placeholder = "The Committee cannot discuss an empty problem. Please type something.";
+      input.focus();
+      return;
+    }
+
+    const btn = $("consultBtn");
+    btn.disabled = true;
+    btn.textContent = "COMMITTEE IN SESSION...";
+
+    $("committee").style.display = "none";
+    $("deliberation").style.display = "none";
+    $("voteSection").style.display = "none";
+    $("verdict").style.display = "none";
+    $("appealBtn").style.display = "none";
+    $("appealBtn").disabled = false;
+    $("appealBtn").textContent = "APPEAL TO HIGHER AUTHORITY";
+    $("appealTerminal").style.display = "none";
+    $("appealCommittee").style.display = "none";
+    $("appealVote").style.display = "none";
+    $("appealDecision").style.display = "none";
+
+    await runTerminal();
+    renderCommittee(problem);
+    await sleep(members.length * 150 + 300);
+    renderDebate(problem);
+    await sleep(members.length * 120 + 250);
+    const votes = renderVotes(problem);
+    await sleep(members.length * 120 + 250);
+    renderVerdict(problem);
+    applyVoteVerdict(problem, votes);
+    latestCase = { problem, outcome: voteOutcome(votes) };
+    const appealBtn = $("appealBtn");
+    appealBtn.style.display = "block";
+    appealBtn.disabled = false;
+    appealBtn.textContent = "APPEAL TO HIGHER AUTHORITY";
+
+    btn.disabled = false;
+    btn.textContent = "CONSULT THE COMMITTEE AGAIN";
+    appealBtn.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  });
+
+  $("appealBtn").addEventListener("click", async () => {
+    if (!latestCase) return;
+    const btn = $("appealBtn");
+    btn.disabled = true;
+    btn.textContent = "APPEAL IN SESSION...";
+
+    await runAppealTerminal();
+    $("appealTerminal").style.display = "none";
+    renderAppealCommittee(latestCase.problem, latestCase.outcome);
+    await sleep(appealAuthorities.length * 150 + 250);
+    const votes = appealVotes(latestCase.problem, latestCase.outcome);
+    renderAppealVotes(votes);
+    await sleep(appealAuthorities.length * 120 + 250);
+    renderAppealDecision(latestCase.problem, latestCase.outcome, votes);
+    btn.disabled = false;
+    btn.textContent = "APPEAL TO HIGHER AUTHORITY";
+    $("appealDecision").scrollIntoView({ behavior: "smooth", block: "nearest" });
+  });
+</script>
+
+</body>
+</html>
